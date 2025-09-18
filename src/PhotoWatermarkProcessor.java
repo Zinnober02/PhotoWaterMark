@@ -111,7 +111,14 @@ public class PhotoWatermarkProcessor {
     
     private Path createOutputDirectory(File parentDir) throws IOException {
         String parentDirName = parentDir.getName();
-        Path outputDir = Paths.get(parentDir.getParent(), parentDirName + "_watermark");
+        Path outputDir;
+        
+        // 如果parentDir.getParent()为null，使用当前工作目录
+        if (parentDir.getParent() == null) {
+            outputDir = Paths.get(System.getProperty("user.dir"), parentDirName + "_watermark");
+        } else {
+            outputDir = Paths.get(parentDir.getParent(), parentDirName + "_watermark");
+        }
         
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
@@ -162,9 +169,12 @@ public class PhotoWatermarkProcessor {
         String outputFileName = imageFile.getName();
         Path outputPath = outputDir.resolve(outputFileName);
         String formatName = getFileExtension(imageFile);
-        ImageIO.write(image, formatName, outputPath.toFile());
-        
-        logger.log(Level.INFO, "已添加水印并保存到: {0}", outputPath.toAbsolutePath());
+        boolean success = ImageIO.write(image, formatName, outputPath.toFile());
+        if (success) {
+            logger.log(Level.INFO, "已添加水印并保存到: {0}", outputPath.toAbsolutePath());
+        } else {
+            logger.log(Level.WARNING, "无法保存图片到: {0}", outputPath.toAbsolutePath());
+        }
     }
     
     private String getWatermarkText(File imageFile) throws ImageProcessingException, IOException, ParseException {
@@ -179,7 +189,9 @@ public class PhotoWatermarkProcessor {
             }
         }
         
-        return null;
+        // 如果无法获取拍摄时间，返回默认的水印文本
+        logger.log(Level.WARNING, "无法获取文件的拍摄时间: {0}，使用默认水印", imageFile.getAbsolutePath());
+        return "Watermark";
     }
     
     private Color parseColor(String colorString) {

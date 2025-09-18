@@ -77,10 +77,22 @@ java -jar PhotoWaterMark-1.0-SNAPSHOT-jar-with-dependencies.jar /path/to/image.j
 
 处理后的图片会保存在与原目录同名但后缀为`_watermark`的子目录中。例如，如果原图片在`photos`目录下，则处理后的图片会保存在`photos_watermark`目录下。
 
+## 测试程序
+
+为了方便测试，项目中包含了一个Test类，可以直接运行来测试程序功能。使用方法如下：
+
+1. 确保在src目录下有一个名为1.jpg的测试图片文件
+2. 编译并运行Test类：
+
+```bash
+javac -cp .:target/dependency/* src/*.java
+java -cp .:target/dependency/* Test
+```
+
 ## 注意事项
 
-- 程序会尝试读取图片的EXIF信息中的拍摄时间，如果无法读取到该信息，则不会为该图片添加水印
-- 对于不包含EXIF信息的图片（如PNG、GIF等格式），程序将无法添加水印
+- 程序会尝试读取图片的EXIF信息中的拍摄时间，如果无法读取到该信息，会使用默认的"Watermark"文本作为水印
+- 对于不包含EXIF信息的图片（如PNG、GIF等格式），程序会使用默认水印文本
 - 请确保有足够的磁盘空间来保存处理后的图片
 
 ## 许可证
